@@ -347,6 +347,45 @@ func (j *Jenkins) GetAllJobNames() ([]InnerJob, error) {
 	return exec.Raw.Jobs, nil
 }
 
+func (j *Jenkins) GetAllJobFolders() ([]InnerJob, error) {
+	exec := Executor{Raw: new(ExecutorResponse), Jenkins: j}
+	_, err := j.Requester.GetJSON("/", exec.Raw, nil)
+
+	if err != nil {
+		return nil, err
+	}
+
+        var folders []InnerJob
+
+        for _, job := range exec.Raw.Jobs {
+        	if job.Class == "com.cloudbees.hudson.plugins.folder.Folder" {
+        		folders = append(folders, job) 
+          	}
+        }
+
+	return folders, nil
+}
+
+func (j *Jenkins) GetAllJobsInFolder(name string) ([]InnerJob, error) {
+        url := "/job/" + name
+	exec := Executor{Raw: new(ExecutorResponse), Jenkins: j}
+	_, err := j.Requester.GetJSON(url, exec.Raw, nil)
+
+	if err != nil {
+		return nil, err
+	}
+
+        var jobs []InnerJob
+
+        for _, job := range exec.Raw.Jobs {
+        	if job.Class != "com.cloudbees.hudson.plugins.folder.Folder" {
+        		jobs = append(jobs, job) 
+          	}
+        }
+
+	return jobs, nil
+}
+
 // Get All Possible Job Objects.
 // Each job will be queried.
 func (j *Jenkins) GetAllJobs() ([]*Job, error) {

@@ -40,6 +40,7 @@ type InnerJob struct {
 	Name  string `json:"name"`
 	Url   string `json:"url"`
 	Color string `json:"color"`
+        Class string `json:"_class"`
 }
 
 type ParameterDefinition struct {
